@@ -80,17 +80,26 @@ USAGE
     parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-V', '--version', action='version', version=program_version_message)
     parser.add_argument('--input', help="The executable to run.")
-    parser.add_argument('--args', nargs='+', help='list of arguments to input for MUSE simulation')
+    parser.add_argument('--args', nargs='+', help='list of arguments to input for MUSE simulation. Remove all "-" and "--" in positional arguments.')
     parser.add_argument('--output', help='Designated output .asm file for the generated code to go. Defaults to output.asm')
-
+    parser.add_argument('--shared-object', help='the shared-object file that the sim depends on')
     # Process arguments
     args = parser.parse_args()
+    arguments = []
+    for i, arg in enumerate(args.args):
+        if i % 2 == 0:
+            arguments.append('--'+arg)
+        else:
+            arguments.append(arg)
 
     t = Transporter()
     t.transport_file(args.input)
 
+    if (args.shared_object):
+        t.transport_file(args.shared_object)
+
     m = MPIExecutor(4)
-    m.exec_sim(args.input, args.args)
+    m.exec_sim(args.input, arguments)
 
 if __name__ == "__main__":
     sys.exit(main())

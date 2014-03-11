@@ -1,5 +1,4 @@
-from mpi4py import MPI
-from subprocess import call
+from os import system
 
 class MPIExecutor:
     def __init__(self, num_nodes, host_list='/home/ubuntu/mpi_hosts'):
@@ -7,7 +6,9 @@ class MPIExecutor:
         self.host_list = host_list
 
     def exec_sim(self, filename, args):
-        cmd = ['mpiexec','-n', self.num_nodes, '--hostfile', self.host_list]
-
-        call(cmd)
+        cmd = 'mpiexec -n {0} --hostfile {1} ./{2}'.format(self.num_nodes, self.host_list, filename)
+        for arg in args:
+            cmd = cmd + " " + arg
+        #print cmd
+        system(cmd)
 
